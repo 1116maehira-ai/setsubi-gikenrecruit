@@ -1090,5 +1090,46 @@
   <!-- LP CONTENT END -->
 </main>
   <script src="./js/main.js" defer></script>
+
+  <!-- ▼ Supabase CMS接続スクリプト -->
+  <script>
+    (function () {
+      var SUPABASE_URL = 'https://pvwktijtqtmvnqofuwro.supabase.co';
+      var SUPABASE_KEY = 'sb_publishable_gBV1tZnuBlhjDwoWBrcugA_qd9Fc4cT';
+
+      // Supabase REST APIでsite_contentを全件取得
+      fetch(SUPABASE_URL + '/rest/v1/site_content?select=content_key,value', {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY
+        }
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Supabase fetch error: ' + res.status);
+        return res.json();
+      })
+      .then(function (rows) {
+        // content_key → value のマップを作成
+        var map = {};
+        rows.forEach(function (row) {
+          map[row.content_key] = row.value;
+        });
+
+        // data-content-key属性を持つ全要素のテキストを書き換え
+        document.querySelectorAll('[data-content-key]').forEach(function (el) {
+          var key = el.getAttribute('data-content-key');
+          if (map[key] !== undefined && map[key] !== null) {
+            el.textContent = map[key];
+          }
+        });
+
+        console.log('[CMS] Supabase接続成功！' + rows.length + '件のコンテンツを反映しました。');
+      })
+      .catch(function (err) {
+        console.log('[CMS] Supabase接続エラー（静的HTMLで表示中）:', err);
+      });
+    })();
+  </script>
+  <!-- ▲ Supabase CMS接続スクリプト ここまで -->
 </body>
 </html>
