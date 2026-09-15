@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>設備技研 採用サイト CMS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f4f8; color: #1a1a1a; }
+
+    /* ログイン画面 */
+    #login-screen {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1A6BB0 0%, #0d4a80 100%);
+    }
+    .login-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .login-box h1 { font-size: 20px; color: #1A6BB0; margin-bottom: 6px; }
+    .login-box p  { font-size: 13px; color: #666; margin-bottom: 28px; }
+    .login-box input {
+      width: 100%; padding: 12px 16px;
+      border: 2px solid #e0e0e0; border-radius: 8px;
+      font-size: 15px; margin-bottom: 16px;
+      transition: border-color .2s;
+    }
+    .login-box input:focus { outline: none; border-color: #1A6BB0; }
+    .login-box button {
+      width: 100%; padding: 13px;
+      background: #1A6BB0; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 15px; font-weight: bold;
+      cursor: pointer; transition: background .2s;
+    }
+    .login-box button:hover { background: #155a96; }
+    .login-error { color: #e53e3e; font-size: 13px; margin-top: 10px; }
+
+    /* メイン画面 */
+    #cms-screen { display: none; }
+    .cms-header {
+      background: #1A6BB0; color: #fff;
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cms-header h1 { font-size: 18px; }
+    .cms-header .logout {
+      background: rgba(255,255,255,0.2);
+      border: none; color: #fff;
+      padding: 6px 14px; border-radius: 6px;
+      cursor: pointer; font-size: 13px;
+    }
+
+    .cms-body { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+
+    /* セクション選択 */
+    .section-bar {
+      background: #fff; border-radius: 12px;
+      padding: 20px; margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .section-bar label { font-size: 13px; color: #666; display: block; margin-bottom: 8px; }
+    .section-bar select {
+      width: 100%; padding: 10px 14px;
+      border: 2px solid #e0e0e0; border-radius: 8px;
+      font-size: 15px; cursor: pointer;
+    }
+    .section-bar select:focus { outline: none; border-color: #1A6BB0; }
+
+    /* コンテンツ一覧 */
+    .content-list { display: flex; flex-direction: column; gap: 12px; }
+    .content-card {
+      background: #fff; border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+    .content-card .key {
+      font-size: 11px; color: #999;
+      font-family: monospace; margin-bottom: 4px;
+    }
+    .content-card .label {
+      font-size: 13px; color: #555; margin-bottom: 8px;
+    }
+    .content-card .value-display {
+      font-size: 15px; color: #1a1a1a;
+      line-height: 1.5;
+    }
+    .content-card textarea {
+      width: 100%; padding: 10px 12px;
+      border: 2px solid #1A6BB0; border-radius: 8px;
+      font-size: 15px; line-height: 1.5;
+      resize: vertical; min-height: 60px;
+      font-family: inherit;
+    }
+    .content-card textarea:focus { outline: none; }
+    .btn-edit {
+      background: #e8f0f8; color: #1A6BB0;
+      border: none; padding: 8px 16px;
+      border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: bold;
+      white-space: nowrap;
+      transition: background .2s;
+    }
+    .btn-edit:hover { background: #d0e4f4; }
+    .btn-save {
+      background: #1A6BB0; color: #fff;
+      border: none; padding: 8px 16px;
+      border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: bold;
+      white-space: nowrap;
+      transition: background .2s;
+    }
+    .btn-save:hover { background: #155a96; }
+    .btn-cancel {
+      background: #f0f0f0; color: #666;
+      border: none; padding: 8px 12px;
+      border-radius: 8px; cursor: pointer;
+      font-size: 13px;
+    }
+    .action-buttons { display: flex; gap: 8px; }
+    .save-result {
+      font-size: 12px; margin-top: 6px;
+      min-height: 18px;
+    }
+    .save-result.success { color: #38a169; }
+    .save-result.error   { color: #e53e3e; }
+
+    /* ローディング */
+    .loading {
+      text-align: center; padding: 60px;
+      color: #999; font-size: 15px;
+    }
+    .spinner {
+      display: inline-block; width: 32px; height: 32px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #1A6BB0;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 統計バー */
+    .stats-bar {
+      background: #e8f0f8; border-radius: 8px;
+      padding: 10px 16px; margin-bottom: 16px;
+      font-size: 13px; color: #1A6BB0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>🔒 設備技研 CMS</h1>
+    <p>採用サイト管理画面</p>
+    <input type="password" id="pw-input" placeholder="パスワードを入力" autocomplete="current-password">
+    <button onclick="doLogin()">ログイン</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- CMS本体 -->
+<div id="cms-screen">
+  <div class="cms-header">
+    <h1>📋 設備技研 採用サイト CMS</h1>
+    <button class="logout" onclick="doLogout()">ログアウト</button>
+  </div>
+
+  <div class="cms-body">
+    <div class="section-bar">
+      <label>セクションを選択してください</label>
+      <select id="section-select" onchange="loadSection()">
+        <option value="">-- セクションを選ぶ --</option>
+        <option value="section01">SECTION 01｜トップ・キャッチ</option>
+        <option value="section02">SECTION 02｜こんな人へ</option>
+        <option value="section03">SECTION 03｜選ばれる理由</option>
+        <option value="section04">SECTION 04｜仕事紹介</option>
+        <option value="section05">SECTION 05｜1日の流れ</option>
+        <option value="section06">SECTION 06｜先輩の声</option>
+        <option value="section07">SECTION 07｜求人情報</option>
+        <option value="section08">SECTION 08｜会社の歩み</option>
+        <option value="section09">SECTION 09｜代表メッセージ</option>
+        <option value="section10">SECTION 10｜先輩のバックグラウンド</option>
+        <option value="section11">SECTION 11｜FAQ・ホンネ</option>
+        <option value="section12">SECTION 12｜エントリー</option>
+        <option value="footer">FOOTER</option>
+      </select>
+    </div>
+
+    <div id="stats-area"></div>
+    <div id="content-area">
+      <div class="loading" style="color:#bbb; padding:40px; text-align:center;">
+        セクションを選んでください
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var SUPABASE_URL = 'https://pvwktijtqtmvnqofuwro.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_gBV1tZnuBlhjDwoWBrcugA_qd9Fc4cT';
+  var PASSWORD     = 'setsubi2026';
+
+  // ── ログイン ──
+  function doLogin() {
+    var pw = document.getElementById('pw-input').value;
+    if (pw === PASSWORD) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('cms-screen').style.display = 'block';
+    } else {
+      document.getElementById('login-error').textContent = 'パスワードが違います';
+    }
+  }
+  document.getElementById('pw-input').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function doLogout() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('cms-screen').style.display = 'none';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('section-select').value = '';
+    document.getElementById('content-area').innerHTML = '<div class="loading" style="color:#bbb;padding:40px;text-align:center;">セクションを選んでください</div>';
+  }
+
+  // ── セクション読み込み ──
+  function loadSection() {
+    var section = document.getElementById('section-select').value;
+    if (!section) return;
+
+    document.getElementById('content-area').innerHTML = '<div class="loading"><div class="spinner"></div><br>読み込み中...</div>';
+    document.getElementById('stats-area').innerHTML = '';
+
+    fetch(SUPABASE_URL + '/rest/v1/site_content?section=eq.' + section + '&order=content_key.asc', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(rows) {
+      if (!rows.length) {
+        document.getElementById('content-area').innerHTML = '<div class="loading">このセクションにデータがありません</div>';
+        return;
+      }
+
+      document.getElementById('stats-area').innerHTML =
+        '<div class="stats-bar">📝 ' + rows.length + '件のコンテンツ</div>';
+
+      var html = '<div class="content-list">';
+      rows.forEach(function(row) {
+        html += '<div class="content-card" id="card-' + row.id + '">' +
+          '<div>' +
+            '<div class="key">' + row.content_key + '</div>' +
+            '<div class="label">' + (row.label || '') + '</div>' +
+            '<div class="value-display" id="disp-' + row.id + '">' + escHtml(row.value || '') + '</div>' +
+            '<textarea id="ta-' + row.id + '" style="display:none">' + escHtml(row.value || '') + '</textarea>' +
+            '<div class="save-result" id="result-' + row.id + '"></div>' +
+          '</div>' +
+          '<div class="action-buttons" id="btn-' + row.id + '">' +
+            '<button class="btn-edit" onclick="startEdit(\'' + row.id + '\')">編集</button>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+      document.getElementById('content-area').innerHTML = html;
+    })
+    .catch(function(err) {
+      document.getElementById('content-area').innerHTML = '<div class="loading">読み込みエラー: ' + err + '</div>';
+    });
+  }
+
+  // ── 編集モード ──
+  function startEdit(id) {
+    document.getElementById('disp-' + id).style.display = 'none';
+    document.getElementById('ta-' + id).style.display = 'block';
+    document.getElementById('ta-' + id).focus();
+    document.getElementById('btn-' + id).innerHTML =
+      '<button class="btn-save" onclick="saveRow(\'' + id + '\')">保存</button>' +
+      '<button class="btn-cancel" onclick="cancelEdit(\'' + id + '\')">キャンセル</button>';
+  }
+
+  function cancelEdit(id) {
+    document.getElementById('disp-' + id).style.display = 'block';
+    document.getElementById('ta-' + id).style.display = 'none';
+    document.getElementById('btn-' + id).innerHTML =
+      '<button class="btn-edit" onclick="startEdit(\'' + id + '\')">編集</button>';
+    document.getElementById('result-' + id).textContent = '';
+  }
+
+  // ── 保存 ──
+  function saveRow(id) {
+    var newVal = document.getElementById('ta-' + id).value;
+    var resultEl = document.getElementById('result-' + id);
+    resultEl.textContent = '保存中...';
+    resultEl.className = 'save-result';
+
+    fetch(SUPABASE_URL + '/rest/v1/site_content?id=eq.' + id, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ value: newVal })
+    })
+    .then(function(res) {
+      if (res.ok) {
+        document.getElementById('disp-' + id).textContent = newVal;
+        cancelEdit(id);
+        resultEl.textContent = '✅ 保存しました！';
+        resultEl.className = 'save-result success';
+        setTimeout(function(){ resultEl.textContent = ''; }, 3000);
+      } else {
+        throw new Error('status ' + res.status);
+      }
+    })
+    .catch(function(err) {
+      resultEl.textContent = '❌ 保存失敗: ' + err;
+      resultEl.className = 'save-result error';
+    });
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
