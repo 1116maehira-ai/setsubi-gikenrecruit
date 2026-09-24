@@ -7,6 +7,49 @@
   <meta name="description" content="沖縄で給排水・空調・消火の設備工事を手がける設備技研。未経験からでも、ちゃんと育つ会社です。">
   <title>設備技研｜採用LP 教材・SECTION 01-12</title>
   <link rel="stylesheet" href="./css/style.css">
+  <style>
+    /* ▼ 全画面表示：max-width制限を外す */
+    .lp { max-width: 100% !important; }
+
+    /* ▼ Section-01 画像：マスクなしのシンプル2枚並べ */
+    .intro__visual { position: absolute; inset: 0; overflow: hidden; }
+    .intro__photo { position: absolute; margin: 0; overflow: hidden; }
+    .intro__photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* PC：左に技術者・右に女性スタッフ、斜め分割 */
+    @media (min-width: 768px) {
+      .intro__photo--technician {
+        inset: 0; width: 60%; left: 40%;
+        clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
+        -webkit-mask: none; mask: none;
+      }
+      .intro__photo--technician img {
+        width: 100%; max-width: none; height: 100%;
+        object-fit: cover; object-position: 40% 20%;
+        position: static; left: auto; top: auto;
+      }
+      .intro__photo--office {
+        inset: 0; width: 48%; right: auto; left: 0;
+        top: 38%; height: 62%;
+        clip-path: polygon(0 0, 100% 8%, 100% 100%, 0 100%);
+        -webkit-mask: none; mask: none;
+        z-index: 1;
+      }
+      .intro__photo--office img {
+        object-position: 58% 30%;
+        transform: none;
+      }
+    }
+
+    /* スマホ：マスクなし・clip-pathのみ（既存設定を上書き） */
+    @media (max-width: 767px) {
+      .intro__photo--office {
+        -webkit-mask: none !important;
+        mask: none !important;
+        clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
+      }
+    }
+  </style>
   <link rel="stylesheet" href="./css/sections/section-01.css">
   <link rel="stylesheet" href="./css/sections/section-02.css">
   <link rel="stylesheet" href="./css/sections/section-03.css">
