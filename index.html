@@ -18,31 +18,43 @@
 
     /* PC：技術者=右上、女性=右下、右辺を揃えて斜めカット */
     @media (min-width: 768px) {
-      /* 技術者：右端固定・上半分・女性と同じ幅 */
+      /* 技術者：右端ガッチリ固定 */
       .intro__photo--technician {
-        top: 0; right: 0;
-        width: 42%; left: auto;
-        height: 50%;
+        position: absolute !important;
+        top: 0 !important;
+        right: 0 !important;
+        left: auto !important;
+        bottom: auto !important;
+        width: 42% !important;
+        height: 50% !important;
         -webkit-mask: none !important; mask: none !important;
-        clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
-        z-index: 0;
+        clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%) !important;
+        z-index: 1;
       }
       .intro__photo--technician img {
-        width: 100%; max-width: none; height: 100%;
-        object-fit: cover; object-position: 50% 15%;
-        position: static; left: auto; top: auto;
+        position: static !important;
+        width: 100% !important; max-width: none !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: 50% 15% !important;
+        left: auto !important; top: auto !important;
+        transform: none !important;
       }
-      /* 女性スタッフ：右端固定・下半分・技術者と同じ幅 */
+      /* 女性スタッフ：右端ガッチリ固定・下半分 */
       .intro__photo--office {
-        top: 50%; right: 0; bottom: 0;
-        width: 42%; left: auto;
+        position: absolute !important;
+        top: 50% !important;
+        right: 0 !important;
+        left: auto !important;
+        bottom: 0 !important;
+        width: 42% !important;
         -webkit-mask: none !important; mask: none !important;
-        clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+        clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%) !important;
         z-index: 2;
       }
       .intro__photo--office img {
-        object-position: 50% 20%;
-        transform: none;
+        object-position: 50% 20% !important;
+        transform: none !important;
       }
     }
 
