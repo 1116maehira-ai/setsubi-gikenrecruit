@@ -17,13 +17,13 @@
     .intro__photo img { width: 100%; height: 100%; object-fit: cover; }
 
     /* PC：技術者=右上大きめ、女性=右下ヘッドラインから */
-        @media (min-width: 768px) {
-      /* 技術者：右揃え・上半分50% */
+            @media (min-width: 768px) {
+      /* 技術者：右揃え・上320px固定 */
       .intro__photo--technician {
         position: absolute !important;
         top: 0 !important; right: 0 !important;
         left: auto !important; bottom: auto !important;
-        width: 50% !important; height: 50% !important;
+        width: 50% !important; height: 320px !important;
         -webkit-mask: none !important; mask: none !important;
         clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%) !important;
         z-index: 1; overflow: hidden !important;
@@ -34,12 +34,12 @@
         object-fit: cover !important; object-position: 60% 60% !important;
         left: 0 !important; top: 0 !important; transform: none !important;
       }
-      /* 女性：右揃え・下半分50% */
+      /* 女性：右揃え・320px以降 */
       .intro__photo--office {
         position: absolute !important;
-        top: 50% !important; right: 0 !important;
+        top: 320px !important; right: 0 !important;
         left: auto !important; bottom: 0 !important;
-        width: 50% !important; height: 50% !important;
+        width: 50% !important;
         -webkit-mask: none !important; mask: none !important;
         clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%) !important;
         z-index: 2; overflow: hidden !important;
