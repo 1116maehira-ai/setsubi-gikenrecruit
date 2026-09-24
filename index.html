@@ -11,37 +11,41 @@
     /* ▼ 全画面表示：max-width制限を外す */
     .lp { max-width: 100% !important; }
 
-    /* ▼ Section-01 画像：マスクなしのシンプル2枚並べ */
+    /* ▼ Section-01 画像：右端配置・斜めカット・マスクなし */
     .intro__visual { position: absolute; inset: 0; overflow: hidden; }
     .intro__photo { position: absolute; margin: 0; overflow: hidden; }
     .intro__photo img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* PC：左に技術者・右に女性スタッフ、斜め分割 */
+    /* PC：技術者=右上、女性=右下、どちらも右端に寄せて斜めカット */
     @media (min-width: 768px) {
+      /* 技術者：右上エリアに斜め左カット */
       .intro__photo--technician {
-        inset: 0; width: 60%; left: 40%;
-        clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
-        -webkit-mask: none; mask: none;
+        top: 0; right: 0; bottom: 0;
+        width: 55%; left: auto;
+        -webkit-mask: none !important; mask: none !important;
+        clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+        z-index: 0;
       }
       .intro__photo--technician img {
         width: 100%; max-width: none; height: 100%;
-        object-fit: cover; object-position: 40% 20%;
+        object-fit: cover; object-position: 50% 15%;
         position: static; left: auto; top: auto;
       }
+      /* 女性スタッフ：技術者の下半分に重ねて斜めカット */
       .intro__photo--office {
-        inset: 0; width: 48%; right: auto; left: 0;
-        top: 38%; height: 62%;
-        clip-path: polygon(0 0, 100% 8%, 100% 100%, 0 100%);
-        -webkit-mask: none; mask: none;
-        z-index: 1;
+        top: 45%; right: 0; bottom: 0;
+        width: 40%; left: auto;
+        -webkit-mask: none !important; mask: none !important;
+        clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%);
+        z-index: 2;
       }
       .intro__photo--office img {
-        object-position: 58% 30%;
+        object-position: 50% 20%;
         transform: none;
       }
     }
 
-    /* スマホ：マスクなし・clip-pathのみ（既存設定を上書き） */
+    /* スマホ：マスクなし・clip-pathのみ */
     @media (max-width: 767px) {
       .intro__photo--office {
         -webkit-mask: none !important;
