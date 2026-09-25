@@ -1,416 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>設備技研 採用サイト CMS</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f4f8; color: #1a1a1a; }
-    #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1A6BB0 0%, #0d4a80 100%); }
-    .login-box { background: #fff; border-radius: 16px; padding: 40px; width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); text-align: center; }
-    .login-box h1 { font-size: 20px; color: #1A6BB0; margin-bottom: 6px; }
-    .login-box p { font-size: 13px; color: #666; margin-bottom: 28px; }
-    .login-box input { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; margin-bottom: 16px; }
-    .login-box button { width: 100%; padding: 13px; background: #1A6BB0; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
-    .login-error { color: #e53e3e; font-size: 13px; margin-top: 10px; }
-    #cms-screen { display: none; }
-    .cms-header { background: #1A6BB0; color: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-    .cms-header h1 { font-size: 16px; }
-    .cms-header .logout { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-    .tab-nav { background: #fff; border-bottom: 2px solid #e0e0e0; display: flex; overflow-x: auto; }
-    .tab-btn { padding: 12px 16px; font-size: 13px; border: none; background: none; cursor: pointer; color: #666; white-space: nowrap; border-bottom: 3px solid transparent; margin-bottom: -2px; }
-    .tab-btn.active { color: #1A6BB0; border-bottom-color: #1A6BB0; font-weight: bold; }
-    .cms-body { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .flash { position: fixed; top: 60px; right: 16px; background: #38a169; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 999; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-    .group-header { font-size: 13px; font-weight: bold; color: #1A6BB0; padding: 8px 0 4px; border-bottom: 1px solid #e0e0e0; margin-bottom: 12px; margin-top: 4px; }
-    .text-set { background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
-    .text-set__key { font-size: 10px; color: #bbb; font-family: monospace; margin-bottom: 2px; }
-    .text-set__name { font-size: 13px; font-weight: bold; color: #555; margin-bottom: 6px; }
-    .text-set__body { font-size: 15px; color: #1a1a1a; line-height: 1.6; margin-bottom: 10px; }
-    .text-set__input { width: 100%; padding: 10px 12px; border: 2px solid #1A6BB0; border-radius: 8px; font-size: 15px; line-height: 1.6; resize: vertical; font-family: inherit; display: none; margin-bottom: 10px; }
-    .text-set__actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
-    .btn-edit { background: #e8f0f8; color: #1A6BB0; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; }
-    .btn-save { background: #1A6BB0; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; display: none; }
-    .btn-cancel { background: #f0f0f0; color: #666; border: none; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; display: none; }
-    .media-card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
-    .media-card__label { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 12px; }
-    .media-card__preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; display: none; }
-    .media-card__preview-video { width: 100%; max-height: 200px; border-radius: 8px; margin-bottom: 12px; display: none; }
-    .media-upload-area { border: 2px dashed #1A6BB0; border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; }
-    .media-upload-area input[type=file] { display: none; }
-    .media-upload-area p { font-size: 14px; color: #1A6BB0; margin-bottom: 4px; }
-    .media-upload-area span { font-size: 12px; color: #999; }
-    .media-status { font-size: 12px; color: #999; margin-top: 8px; }
-    .loading { text-align: center; padding: 40px; color: #999; }
-    .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid #e0e0e0; border-top-color: #1A6BB0; border-radius: 50%; animation: spin .8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
-</head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>設備技研 CMS</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans JP","Yu Gothic",sans-serif;background:#eef5fb;color:#12263a}.shell{width:min(980px,calc(100% - 28px));margin:24px auto 80px}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.head h1{font-size:24px;margin:0;color:#004b9e}.card{background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,55,110,.10);padding:18px;margin-bottom:16px}.login{max-width:460px;margin:70px auto}.row{display:grid;gap:8px;margin-bottom:14px}label{font-size:13px;font-weight:900;color:#40627f}input,textarea,select{width:100%;border:1px solid #c9d8e6;border-radius:10px;padding:12px;font:inherit;background:#fff}textarea{min-height:110px;resize:vertical}.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:900;cursor:pointer;background:#0055ad;color:#fff}.btn.alt{background:#dce9f6;color:#17456d}.btn.danger{background:#b92727}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.section-title{font-size:18px;font-weight:1000;color:#0050a7;margin:0 0 12px}.field{padding:14px 0;border-top:1px solid #edf2f6}.field:first-child{border-top:0}.meta{font-size:11px;color:#789}.preview{margin-top:8px;max-width:220px;max-height:150px;border-radius:8px;object-fit:cover}.status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0c2944;color:#fff;padding:10px 16px;border-radius:999px;display:none;z-index:99}.status.show{display:block}.hidden{display:none}.hint{font-size:13px;color:#55748f;line-height:1.7}
+</style></head>
 <body>
-
-<div id="login-screen">
-  <div class="login-box">
-    <h1>🔒 設備技研 CMS</h1>
-    <p>採用サイト管理画面</p>
-    <input type="password" id="pw-input" placeholder="パスワードを入力">
-    <button onclick="doLogin()">ログイン</button>
-    <div class="login-error" id="login-error"></div>
-  </div>
+<div class="shell">
+<div id="loginView" class="login card">
+<h1>設備技研 CMS</h1>
+<p class="hint">Supabase Auth の管理者アカウントでログインします。</p>
+<div class="row"><label>メールアドレス</label><input id="email" type="email" autocomplete="username"></div>
+<div class="row"><label>パスワード</label><input id="password" type="password" autocomplete="current-password"></div>
+<button class="btn" id="loginBtn">ログイン</button>
+<p id="loginError" class="hint"></p>
 </div>
-
-<div class="flash" id="flash">✅ 保存しました！</div>
-
-<div id="cms-screen">
-  <div class="cms-header">
-    <h1>📋 設備技研 採用サイト CMS</h1>
-    <button class="logout" onclick="doLogout()">ログアウト</button>
-  </div>
-
-  <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('media',this)">📷 画像・動画</button>
-    <button class="tab-btn" onclick="switchTab('s01',this)">01 トップ</button>
-    <button class="tab-btn" onclick="switchTab('s02',this)">02 こんな人へ</button>
-    <button class="tab-btn" onclick="switchTab('s03',this)">03 選ばれる理由</button>
-    <button class="tab-btn" onclick="switchTab('s04',this)">04 仕事紹介</button>
-    <button class="tab-btn" onclick="switchTab('s05',this)">05 1日の流れ</button>
-    <button class="tab-btn" onclick="switchTab('s06',this)">06 先輩の声</button>
-    <button class="tab-btn" onclick="switchTab('s07',this)">07 求人情報</button>
-    <button class="tab-btn" onclick="switchTab('s08',this)">08 会社の歩み</button>
-    <button class="tab-btn" onclick="switchTab('s09',this)">09 代表メッセージ</button>
-    <button class="tab-btn" onclick="switchTab('s11',this)">11 FAQ</button>
-    <button class="tab-btn" onclick="switchTab('s12',this)">12 エントリー</button>
-  </div>
-
-  <div class="cms-body">
-    <div class="tab-content active" id="tab-media">
-      <div class="group-header">📷 画像・動画の差し替え（CMSからアップするとサイトに即反映）</div>
-      <div class="media-card">
-        <div class="media-card__label">技術者の写真（Section 01 右上）</div>
-        <img class="media-card__preview" id="prev-technician">
-        <div class="media-upload-area" onclick="document.getElementById('file-technician').click()">
-          <input type="file" id="file-technician" accept="image/*" onchange="uploadMedia(this,'technician-extended.webp','prev-technician',false)">
-          <p>📤 タップして写真を選ぶ</p>
-          <span>JPG / PNG / WEBP 対応</span>
-        </div>
-        <div class="media-status" id="status-technician"></div>
-      </div>
-      <div class="media-card">
-        <div class="media-card__label">女性スタッフの写真（Section 01 右下）</div>
-        <img class="media-card__preview" id="prev-office">
-        <div class="media-upload-area" onclick="document.getElementById('file-office').click()">
-          <input type="file" id="file-office" accept="image/*" onchange="uploadMedia(this,'office-staff-extended.webp','prev-office',false)">
-          <p>📤 タップして写真を選ぶ</p>
-          <span>JPG / PNG / WEBP 対応</span>
-        </div>
-        <div class="media-status" id="status-office"></div>
-      </div>
-      <div class="media-card">
-        <div class="media-card__label">背景動画（Section 01 背景）</div>
-        <video class="media-card__preview-video" id="prev-video" controls></video>
-        <div class="media-upload-area" onclick="document.getElementById('file-video').click()">
-          <input type="file" id="file-video" accept="video/mp4,video/*" onchange="uploadMedia(this,'mv-s.mp4','prev-video',true)">
-          <p>📤 タップして動画を選ぶ</p>
-          <span>MP4 対応（50MB以下推奨）</span>
-        </div>
-        <div class="media-status" id="status-video"></div>
-      </div>
-    </div>
-    <div class="tab-content" id="tab-s01"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s02"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s03"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s04"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s05"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s06"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s07"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s08"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s09"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s11"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="tab-content" id="tab-s12"><div class="loading"><div class="spinner"></div></div></div>
-  </div>
+<div id="appView" class="hidden">
+<div class="head"><div><h1>設備技研 採用サイト CMS</h1><div class="hint">文字・画像・動画を変更して「保存」。公開サイトへ即時反映されます。</div></div><div class="toolbar"><a class="btn alt" href="index.html" target="_blank" style="text-decoration:none">サイトを見る</a><button class="btn alt" id="reloadBtn">再読込</button><button class="btn danger" id="logoutBtn">ログアウト</button></div></div>
+<div id="sections"></div>
 </div>
-
+</div>
+<div class="status" id="status"></div>
 <script>
-var SUPABASE_URL='https://pvwktijtqtmvnqofuwro.supabase.co';
-var SUPABASE_KEY='sb_publishable_gBV1tZnuBlhjDwoWBrcugA_qd9Fc4cT';
-var BUCKET='site-assets';
-var PASSWORD='setsubi2026';
-var allData={};
-
-function doLogin(){
-  if(document.getElementById('pw-input').value===PASSWORD){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('cms-screen').style.display='block';
-    loadAllData();
-    loadMediaPreviews();
-  } else {
-    document.getElementById('login-error').textContent='パスワードが違います';
-  }
+const SUPABASE_URL="https://pvwktijtqtmvnqofuwro.supabase.co";
+const SUPABASE_KEY="sb_publishable_gBV1tZnuBlhjDwoWBrcugA_qd9Fc4cT";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=s=>document.querySelector(s);const esc=s=>(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+function toast(msg){const e=$("#status");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)}
+async function login(){const {error}=await sb.auth.signInWithPassword({email:$("#email").value.trim(),password:$("#password").value});$("#loginError").textContent=error?error.message:"";if(!error)showApp()}
+async function logout(){await sb.auth.signOut();location.reload()}
+async function showApp(){const {data:{session}}=await sb.auth.getSession();if(!session)return;$("#loginView").classList.add("hidden");$("#appView").classList.remove("hidden");load()}
+function inputFor(r){
+ const id="f_"+r.id;
+ if(r.content_type==="textarea"||r.content_type==="richtext") return '<textarea id="'+id+'">'+esc(r.value)+'</textarea>';
+ if(r.content_type==="image"||r.content_type==="video") return '<input id="'+id+'" value="'+esc(r.value)+'"><div class="toolbar" style="margin-top:8px"><input type="file" id="file_'+r.id+'" accept="'+(r.content_type==="image"?"image/*":"video/*")+'" style="max-width:340px"><button class="btn alt" onclick="uploadMedia('+r.id+',\''+r.content_type+'\')">アップロード</button></div>'+(r.content_type==="image"&&r.value?'<img class="preview" src="'+esc(r.value)+'">':"");
+ return '<input id="'+id+'" value="'+esc(r.value)+'">';
 }
-document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
-function doLogout(){
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('cms-screen').style.display='none';
+async function load(){
+ const {data,error}=await sb.from("site_content").select("*").order("section_order").order("sort_order");
+ if(error){toast("読込エラー");return}
+ const groups={};(data||[]).forEach(r=>(groups[r.section_key]??=[]).push(r));
+ $("#sections").innerHTML=Object.entries(groups).map(([sec,rows])=>'<section class="card"><h2 class="section-title">'+sec+'</h2>'+rows.map(r=>'<div class="field"><label>'+esc(r.label)+'</label><div class="meta">'+r.field_key+' / '+r.content_type+'</div>'+inputFor(r)+'<div style="margin-top:8px"><button class="btn" onclick="saveField('+r.id+')">保存</button></div></div>').join("")+'</section>').join("");
 }
-
-var loadedTabs={media:true};
-function switchTab(id,btn){
-  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
-  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
-  if(!loadedTabs[id]){renderSection(id);loadedTabs[id]=true;}
+async function saveField(id){const value=$("#f_"+id).value;const {error}=await sb.from("site_content").update({value}).eq("id",id);toast(error?"保存に失敗しました":"保存しました")}
+async function uploadMedia(id,type){
+ const input=$("#file_"+id);if(!input.files[0]){toast("ファイルを選択してください");return}
+ const file=input.files[0];const ext=file.name.split(".").pop();const path=(type==="image"?"images/":"videos/")+Date.now()+"_"+Math.random().toString(36).slice(2)+"."+ext;
+ const {error}=await sb.storage.from("site-media").upload(path,file,{upsert:false});
+ if(error){toast("アップロード失敗");return}
+ const {data}=sb.storage.from("site-media").getPublicUrl(path);$("#f_"+id).value=data.publicUrl;await saveField(id);load();
 }
-
-function loadAllData(){
-  fetch(SUPABASE_URL+'/rest/v1/site_content?select=id,content_key,value&order=content_key.asc',{
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
-  }).then(function(r){return r.json();}).then(function(rows){
-    rows.forEach(function(r){allData[r.content_key]=r;});
-    renderSection('s01');loadedTabs['s01']=true;
-  });
-}
-
-var DEFS={
-  s01:[
-    {g:'キャッチコピー',items:[
-      {k:'section01.lead',n:'リード文'},
-      {k:'section01.title.line01',n:'タイトル 1行目'},
-      {k:'section01.title.line02',n:'タイトル 2行目'},
-      {k:'section01.title.line03',n:'タイトル 3行目'},
-      {k:'section01.title.line04',n:'タイトル 4行目'},
-    ]},
-    {g:'本文',items:[
-      {k:'section01.body.line01',n:'本文 1行目'},
-      {k:'section01.body.line02',n:'本文 2行目'},
-      {k:'section01.body.line03',n:'本文 3行目'},
-      {k:'section01.body.line04',n:'本文 4行目'},
-    ]},
-    {g:'アピールポイント（未経験歓迎）',items:[
-      {k:'section01.benefit.beginner.title',n:'タイトル'},
-      {k:'section01.benefit.beginner.body',n:'説明文'},
-    ]},
-    {g:'アピールポイント（面接1回）',items:[
-      {k:'section01.benefit.interview.title',n:'タイトル'},
-      {k:'section01.benefit.interview.body',n:'説明文'},
-    ]},
-    {g:'アピールポイント（給与）',items:[
-      {k:'section01.benefit.salary.title',n:'タイトル'},
-      {k:'section01.benefit.salary.body',n:'説明文'},
-    ]},
-  ],
-  s02:[
-    {g:'タイトル',items:[
-      {k:'section02.title.line01',n:'1行目'},
-      {k:'section02.title.line02',n:'2行目'},
-    ]},
-    {g:'カード①',items:[{k:'section02.card01',n:'テキスト'}]},
-    {g:'カード②',items:[{k:'section02.card02',n:'テキスト'}]},
-    {g:'カード③',items:[{k:'section02.card03',n:'テキスト'}]},
-    {g:'カード④',items:[{k:'section02.card04',n:'テキスト'}]},
-    {g:'カード⑤',items:[{k:'section02.card05',n:'テキスト'}]},
-    {g:'締めのメッセージ',items:[
-      {k:'section02.reassurance.line01',n:'1行目'},
-      {k:'section02.reassurance.line02',n:'2行目'},
-    ]},
-  ],
-  s03:[
-    {g:'タイトル',items:[
-      {k:'section03.title.line01',n:'1行目'},{k:'section03.title.line02',n:'2行目'},{k:'section03.title.line03',n:'3行目'},
-    ]},
-    {g:'理由① 面接・経験不問',items:[
-      {k:'section03.reason01.title',n:'タイトル'},{k:'section03.reason01.body01',n:'本文①'},{k:'section03.reason01.body02',n:'本文②'},{k:'section03.reason01.body03',n:'本文③'},
-    ]},
-    {g:'理由② 4連休',items:[
-      {k:'section03.reason02.title',n:'タイトル'},{k:'section03.reason02.body01',n:'本文①'},{k:'section03.reason02.body02',n:'本文②'},
-    ]},
-    {g:'理由③ 給与',items:[
-      {k:'section03.reason03.title',n:'タイトル'},{k:'section03.reason03.body01',n:'本文①'},{k:'section03.reason03.body02',n:'本文②'},
-    ]},
-    {g:'理由④ 教育',items:[
-      {k:'section03.reason04.title',n:'タイトル'},{k:'section03.reason04.body01',n:'本文①'},{k:'section03.reason04.body02',n:'本文②'},
-    ]},
-    {g:'理由⑤ 資格取得',items:[
-      {k:'section03.reason05.title',n:'タイトル'},{k:'section03.reason05.body01',n:'本文①'},{k:'section03.reason05.body02',n:'本文②'},
-    ]},
-  ],
-  s04:[
-    {g:'タイトル',items:[{k:'section04.title',n:'タイトル'}]},
-    {g:'施工管理',items:[{k:'section04.job01.title',n:'職種名'},{k:'section04.job01.body01',n:'本文①'},{k:'section04.job01.body02',n:'本文②'}]},
-    {g:'工務・メンテナンス',items:[{k:'section04.job02.title',n:'職種名'},{k:'section04.job02.body01',n:'本文①'}]},
-    {g:'積算',items:[{k:'section04.job03.title',n:'職種名'},{k:'section04.job03.body01',n:'本文①'}]},
-    {g:'申請業務',items:[{k:'section04.job04.title',n:'職種名'},{k:'section04.job04.body01',n:'本文①'}]},
-  ],
-  s05:[
-    {g:'タイトル',items:[{k:'section05.title',n:'タイトル'}]},
-    {g:'施工管理の1日',items:[
-      {k:'section05.manager.0800.title',n:'08:00'},{k:'section05.manager.0800.body01',n:'08:00 内容'},
-      {k:'section05.manager.0830.title',n:'08:30'},
-      {k:'section05.manager.1200.title',n:'12:00'},
-      {k:'section05.manager.1700.title',n:'17:00'},
-    ]},
-    {g:'配管工の1日',items:[
-      {k:'section05.craftsman.0800.title',n:'08:00'},
-      {k:'section05.craftsman.0830.title',n:'08:30'},{k:'section05.craftsman.0830.body01',n:'08:30 内容'},
-      {k:'section05.craftsman.1730.title',n:'17:30'},
-    ]},
-  ],
-  s06:[
-    {g:'先輩① 久場 一輝',items:[
-      {k:'section06.voice01.name',n:'名前'},{k:'section06.voice01.catch',n:'キャッチ'},
-      {k:'section06.voice01.body01',n:'本文①'},{k:'section06.voice01.body02',n:'本文②'},{k:'section06.voice01.body03',n:'本文③'},
-    ]},
-    {g:'先輩② 與那嶺 賢人',items:[
-      {k:'section06.voice02.name',n:'名前'},{k:'section06.voice02.catch',n:'キャッチ'},
-      {k:'section06.voice02.body01',n:'本文①'},{k:'section06.voice02.body02',n:'本文②'},
-    ]},
-  ],
-  s07:[
-    {g:'職種・雇用形態',items:[
-      {k:'section07.jobtype.line01',n:'職種①'},{k:'section07.jobtype.line02',n:'職種②'},{k:'section07.employment.line01',n:'雇用形態'},
-    ]},
-    {g:'給与・勤務時間',items:[
-      {k:'section07.salary.line01',n:'給与'},{k:'section07.salary.line02',n:'手当'},{k:'section07.salary.note',n:'備考'},{k:'section07.hours.line01',n:'勤務時間'},
-    ]},
-    {g:'休日・勤務地',items:[
-      {k:'section07.holidays.01',n:'休日①'},{k:'section07.holidays.02',n:'休日②'},{k:'section07.location.line01',n:'勤務地'},
-    ]},
-    {g:'福利厚生',items:[
-      {k:'section07.benefits.01',n:'福利厚生①'},{k:'section07.benefits.02',n:'福利厚生②'},{k:'section07.benefits.03',n:'福利厚生③'},{k:'section07.benefits.04',n:'福利厚生④'},
-    ]},
-  ],
-  s08:[
-    {g:'会社の歩み',items:[
-      {k:'section08.history.1992',n:'1992年'},{k:'section08.history.1997',n:'1997年'},{k:'section08.history.2000',n:'2000年'},
-      {k:'section08.history.2003',n:'2003年'},{k:'section08.history.2007',n:'2007年'},{k:'section08.history.2009',n:'2009年'},{k:'section08.history.2026',n:'2026年'},
-    ]},
-  ],
-  s09:[
-    {g:'代表 平良 智 のメッセージ',items:[
-      {k:'section09.left.heading',n:'見出し'},{k:'section09.left.body01',n:'本文①'},{k:'section09.left.body02',n:'本文②'},{k:'section09.left.body03',n:'本文③'},
-    ]},
-    {g:'専務 平良 淳 のメッセージ',items:[
-      {k:'section09.right.heading',n:'見出し'},{k:'section09.right.body01',n:'本文①'},{k:'section09.right.body02',n:'本文②'},{k:'section09.right.body03',n:'本文③'},
-    ]},
-  ],
-  s11:[
-    {g:'FAQ',items:[
-      {k:'section11.faq01.q',n:'質問①'},{k:'section11.faq01.a',n:'回答①'},
-      {k:'section11.faq02.q',n:'質問②'},{k:'section11.faq02.a',n:'回答②'},
-      {k:'section11.faq03.q',n:'質問③'},{k:'section11.faq03.a',n:'回答③'},
-    ]},
-  ],
-  s12:[
-    {g:'エントリーフォーム',items:[
-      {k:'section12.title',n:'タイトル'},{k:'section12.body01',n:'本文①'},{k:'section12.body02',n:'本文②'},
-      {k:'section12.body03',n:'本文③'},{k:'section12.form.submit',n:'送信ボタン文言'},
-    ]},
-  ],
-};
-
-function renderSection(tabId){
-  var el=document.getElementById('tab-'+tabId);
-  if(!DEFS[tabId])return;
-  var html='';
-  DEFS[tabId].forEach(function(group){
-    html+='<div class="group-header">'+group.g+'</div>';
-    group.items.forEach(function(item){
-      var sid=item.k.replace(/\./g,'_');
-      var row=allData[item.k];
-      var val=row?(row.value||''):'';
-      var id=row?row.id:'';
-      html+='<div class="text-set" id="set-'+sid+'">'+
-        '<div class="text-set__key">'+item.k+'</div>'+
-        '<div class="text-set__name">'+item.n+'</div>'+
-        '<div class="text-set__body" id="disp-'+sid+'">'+esc(val)+'</div>'+
-        '<textarea class="text-set__input" id="ta-'+sid+'" rows="2">'+esc(val)+'</textarea>'+
-        '<div class="text-set__actions">'+
-          '<button class="btn-cancel" id="cancel-'+sid+'" onclick="cancelEdit(\''+sid+'\')">キャンセル</button>'+
-          '<button class="btn-save" id="save-'+sid+'" onclick="saveRow(\''+sid+'\',\''+id+'\')">保存</button>'+
-          '<button class="btn-edit" id="edit-'+sid+'" onclick="startEdit(\''+sid+'\')">編集</button>'+
-        '</div>'+
-      '</div>';
-    });
-  });
-  el.innerHTML=html;
-}
-
-function startEdit(sid){
-  document.getElementById('disp-'+sid).style.display='none';
-  document.getElementById('ta-'+sid).style.display='block';
-  document.getElementById('ta-'+sid).focus();
-  document.getElementById('save-'+sid).style.display='inline-block';
-  document.getElementById('cancel-'+sid).style.display='inline-block';
-  document.getElementById('edit-'+sid).style.display='none';
-}
-function cancelEdit(sid){
-  document.getElementById('disp-'+sid).style.display='block';
-  document.getElementById('ta-'+sid).style.display='none';
-  document.getElementById('save-'+sid).style.display='none';
-  document.getElementById('cancel-'+sid).style.display='none';
-  document.getElementById('edit-'+sid).style.display='inline-block';
-}
-function saveRow(sid,rowId){
-  var newVal=document.getElementById('ta-'+sid).value;
-  fetch(SUPABASE_URL+'/rest/v1/site_content?id=eq.'+rowId,{
-    method:'PATCH',
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({value:newVal})
-  }).then(function(res){
-    if(res.ok){document.getElementById('disp-'+sid).textContent=newVal;cancelEdit(sid);showFlash();}
-  });
-}
-function showFlash(){
-  var f=document.getElementById('flash');
-  f.style.display='block';
-  setTimeout(function(){f.style.display='none';},2500);
-}
-
-function loadMediaPreviews(){
-  var files=[
-    {name:'technician-extended.webp',prevId:'prev-technician',isVideo:false,statusId:'status-technician'},
-    {name:'office-staff-extended.webp',prevId:'prev-office',isVideo:false,statusId:'status-office'},
-    {name:'mv-s.mp4',prevId:'prev-video',isVideo:true,statusId:'status-video'},
-  ];
-  files.forEach(function(f){
-    var url=SUPABASE_URL+'/storage/v1/object/public/'+BUCKET+'/'+f.name+'?t='+Date.now();
-    document.getElementById(f.statusId).textContent='現在: '+f.name;
-    if(f.isVideo){
-      var v=document.getElementById(f.prevId);
-      v.src=url; v.style.display='block';
-    } else {
-      var img=document.getElementById(f.prevId);
-      img.src=url; img.style.display='block';
-    }
-  });
-}
-
-function uploadMedia(input,fileName,prevId,isVideo){
-  var file=input.files[0];
-  if(!file)return;
-  var card=input.closest('.media-card');
-  var statusEl=card.querySelector('.media-status');
-  statusEl.textContent='アップロード中...';
-  fetch(SUPABASE_URL+'/storage/v1/object/'+BUCKET+'/'+fileName,{
-    method:'PUT',
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':file.type,'x-upsert':'true'},
-    body:file
-  }).then(function(res){
-    if(res.ok){
-      var url=SUPABASE_URL+'/storage/v1/object/public/'+BUCKET+'/'+fileName+'?t='+Date.now();
-      statusEl.textContent='✅ 更新しました！サイトに即反映されます';
-      if(isVideo){var v=document.getElementById(prevId);v.src=url;v.style.display='block';}
-      else{var img=document.getElementById(prevId);img.src=url;img.style.display='block';}
-      showFlash();
-    } else {
-      statusEl.textContent='❌ アップロード失敗';
-    }
-  });
-}
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+$("#loginBtn").onclick=login;$("#logoutBtn").onclick=logout;$("#reloadBtn").onclick=load;
+sb.auth.onAuthStateChange((_e,s)=>{if(s)showApp()});
+showApp();
 </script>
-</body>
-</html>
+</body></html>
