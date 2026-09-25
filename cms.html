@@ -1,59 +1,173 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>設備技研 CMS</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans JP","Yu Gothic",sans-serif;background:#eef5fb;color:#12263a}.shell{width:min(980px,calc(100% - 28px));margin:24px auto 80px}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.head h1{font-size:24px;margin:0;color:#004b9e}.card{background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,55,110,.10);padding:18px;margin-bottom:16px}.login{max-width:460px;margin:70px auto}.row{display:grid;gap:8px;margin-bottom:14px}label{font-size:13px;font-weight:900;color:#40627f}input,textarea,select{width:100%;border:1px solid #c9d8e6;border-radius:10px;padding:12px;font:inherit;background:#fff}textarea{min-height:110px;resize:vertical}.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:900;cursor:pointer;background:#0055ad;color:#fff}.btn.alt{background:#dce9f6;color:#17456d}.btn.danger{background:#b92727}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.section-title{font-size:18px;font-weight:1000;color:#0050a7;margin:0 0 12px}.field{padding:14px 0;border-top:1px solid #edf2f6}.field:first-child{border-top:0}.meta{font-size:11px;color:#789}.preview{margin-top:8px;max-width:220px;max-height:150px;border-radius:8px;object-fit:cover}.status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0c2944;color:#fff;padding:10px 16px;border-radius:999px;display:none;z-index:99}.status.show{display:block}.hidden{display:none}.hint{font-size:13px;color:#55748f;line-height:1.7}
-</style></head>
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans JP","Yu Gothic",sans-serif;background:#eef5fb;color:#12263a}.shell{width:min(980px,calc(100% - 28px));margin:24px auto 80px}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.head h1{font-size:24px;margin:0;color:#004b9e}.card{background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,55,110,.10);padding:18px;margin-bottom:16px}.login{max-width:460px;margin:70px auto}.row{display:grid;gap:8px;margin-bottom:14px}label{font-size:13px;font-weight:900;color:#40627f}input,textarea{width:100%;border:1px solid #c9d8e6;border-radius:10px;padding:12px;font:inherit;background:#fff}textarea{min-height:110px;resize:vertical}.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:900;cursor:pointer;background:#0055ad;color:#fff}.btn.alt{background:#dce9f6;color:#17456d}.btn.danger{background:#b92727}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.section-title{font-size:18px;font-weight:1000;color:#0050a7;margin:0 0 12px}.field{padding:14px 0;border-top:1px solid #edf2f6}.field:first-child{border-top:0}.meta{font-size:11px;color:#789}.preview{margin-top:8px;max-width:220px;max-height:150px;border-radius:8px;object-fit:cover}.status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0c2944;color:#fff;padding:10px 16px;border-radius:999px;display:none;z-index:99}.status.show{display:block}.hidden{display:none}.hint{font-size:13px;color:#55748f;line-height:1.7}.admin-email{font-weight:900;color:#004b9e;background:#eff7ff;padding:10px 12px;border-radius:10px;margin:10px 0 16px;word-break:break-all}.divider{height:1px;background:#e8eef4;margin:18px 0}
+</style>
+</head>
 <body>
 <div class="shell">
-<div id="loginView" class="login card">
-<h1>設備技研 CMS</h1>
-<p class="hint">Supabase Auth の管理者アカウントでログインします。</p>
-<div class="row"><label>メールアドレス</label><input id="email" type="email" autocomplete="username"></div>
-<div class="row"><label>パスワード</label><input id="password" type="password" autocomplete="current-password"></div>
-<button class="btn" id="loginBtn">ログイン</button>
-<p id="loginError" class="hint"></p>
+  <div id="loginView" class="login card">
+    <h1>設備技研 CMS</h1>
+    <p class="hint">管理者メールは固定しています。</p>
+    <div class="admin-email">1116maehira@gmail.com</div>
+
+    <button class="btn" id="magicBtn" style="width:100%">メールにログインリンクを送る</button>
+    <p id="magicMsg" class="hint"></p>
+
+    <div class="divider"></div>
+
+    <p class="hint">パスワード方式を使う場合はこちら。初回は「アカウント作成」を押してください。</p>
+    <div class="row">
+      <label>パスワード</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="8文字以上">
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="loginBtn">ログイン</button>
+      <button class="btn alt" id="signupBtn">初回アカウント作成</button>
+    </div>
+    <p id="loginError" class="hint"></p>
+  </div>
+
+  <div id="appView" class="hidden">
+    <div class="head">
+      <div>
+        <h1>設備技研 採用サイト CMS</h1>
+        <div class="hint">文字・画像・動画を変更して「保存」。公開サイトへ反映されます。</div>
+      </div>
+      <div class="toolbar">
+        <a class="btn alt" href="index.html" target="_blank" style="text-decoration:none">サイトを見る</a>
+        <button class="btn alt" id="reloadBtn">再読込</button>
+        <button class="btn danger" id="logoutBtn">ログアウト</button>
+      </div>
+    </div>
+    <div id="sections"></div>
+  </div>
 </div>
-<div id="appView" class="hidden">
-<div class="head"><div><h1>設備技研 採用サイト CMS</h1><div class="hint">文字・画像・動画を変更して「保存」。公開サイトへ即時反映されます。</div></div><div class="toolbar"><a class="btn alt" href="index.html" target="_blank" style="text-decoration:none">サイトを見る</a><button class="btn alt" id="reloadBtn">再読込</button><button class="btn danger" id="logoutBtn">ログアウト</button></div></div>
-<div id="sections"></div>
-</div>
-</div>
+
 <div class="status" id="status"></div>
+
 <script>
 const SUPABASE_URL="https://pvwktijtqtmvnqofuwro.supabase.co";
 const SUPABASE_KEY="sb_publishable_gBV1tZnuBlhjDwoWBrcugA_qd9Fc4cT";
+const ADMIN_EMAIL="1116maehira@gmail.com";
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=s=>document.querySelector(s);const esc=s=>(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
-function toast(msg){const e=$("#status");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)}
-async function login(){const {error}=await sb.auth.signInWithPassword({email:$("#email").value.trim(),password:$("#password").value});$("#loginError").textContent=error?error.message:"";if(!error)showApp()}
+
+const $=s=>document.querySelector(s);
+const esc=s=>(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+function toast(msg){const e=$("#status");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2400)}
+
+async function magicLogin(){
+  $("#magicMsg").textContent="送信中...";
+  const redirectTo=location.href.split("#")[0].split("?")[0];
+  const {error}=await sb.auth.signInWithOtp({
+    email:ADMIN_EMAIL,
+    options:{shouldCreateUser:true,emailRedirectTo:redirectTo}
+  });
+  $("#magicMsg").textContent=error ? "送信できませんでした："+error.message : "ログインメールを送りました。メール内のリンクを押してください。";
+}
+
+async function passwordLogin(){
+  const password=$("#password").value;
+  if(!password){$("#loginError").textContent="パスワードを入力してください。";return}
+  const {error}=await sb.auth.signInWithPassword({email:ADMIN_EMAIL,password});
+  $("#loginError").textContent=error?error.message:"";
+  if(!error)showApp();
+}
+
+async function signup(){
+  const password=$("#password").value;
+  if(!password || password.length<8){$("#loginError").textContent="8文字以上のパスワードを入力してください。";return}
+  const redirectTo=location.href.split("#")[0].split("?")[0];
+  const {data,error}=await sb.auth.signUp({
+    email:ADMIN_EMAIL,
+    password,
+    options:{emailRedirectTo:redirectTo}
+  });
+  if(error){$("#loginError").textContent=error.message;return}
+  if(data.session){$("#loginError").textContent="アカウントを作成しました。";showApp()}
+  else $("#loginError").textContent="確認メールを送りました。メール内のリンクを押したあと、この画面でログインしてください。";
+}
+
 async function logout(){await sb.auth.signOut();location.reload()}
-async function showApp(){const {data:{session}}=await sb.auth.getSession();if(!session)return;$("#loginView").classList.add("hidden");$("#appView").classList.remove("hidden");load()}
+
+async function showApp(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)return;
+  if((session.user?.email||"").toLowerCase()!==ADMIN_EMAIL){
+    await sb.auth.signOut();
+    $("#loginError").textContent="このアカウントにはCMS権限がありません。";
+    return;
+  }
+  $("#loginView").classList.add("hidden");
+  $("#appView").classList.remove("hidden");
+  load();
+}
+
 function inputFor(r){
- const id="f_"+r.id;
- if(r.content_type==="textarea"||r.content_type==="richtext") return '<textarea id="'+id+'">'+esc(r.value)+'</textarea>';
- if(r.content_type==="image"||r.content_type==="video") return '<input id="'+id+'" value="'+esc(r.value)+'"><div class="toolbar" style="margin-top:8px"><input type="file" id="file_'+r.id+'" accept="'+(r.content_type==="image"?"image/*":"video/*")+'" style="max-width:340px"><button class="btn alt" onclick="uploadMedia('+r.id+',\''+r.content_type+'\')">アップロード</button></div>'+(r.content_type==="image"&&r.value?'<img class="preview" src="'+esc(r.value)+'">':"");
- return '<input id="'+id+'" value="'+esc(r.value)+'">';
+  const id="f_"+r.id;
+  if(r.content_type==="textarea"||r.content_type==="richtext")
+    return '<textarea id="'+id+'">'+esc(r.value)+'</textarea>';
+
+  if(r.content_type==="image"||r.content_type==="video")
+    return '<input id="'+id+'" value="'+esc(r.value)+'">'+
+      '<div class="toolbar" style="margin-top:8px">'+
+      '<input type="file" id="file_'+r.id+'" accept="'+(r.content_type==="image"?"image/*":"video/*")+'" style="max-width:340px">'+
+      '<button class="btn alt" onclick="uploadMedia('+r.id+',\''+r.content_type+'\')">アップロード</button>'+
+      '</div>'+
+      (r.content_type==="image"&&r.value?'<img class="preview" src="'+esc(r.value)+'">':"");
+
+  return '<input id="'+id+'" value="'+esc(r.value)+'">';
 }
+
 async function load(){
- const {data,error}=await sb.from("site_content").select("*").order("section_order").order("sort_order");
- if(error){toast("読込エラー");return}
- const groups={};(data||[]).forEach(r=>(groups[r.section_key]??=[]).push(r));
- $("#sections").innerHTML=Object.entries(groups).map(([sec,rows])=>'<section class="card"><h2 class="section-title">'+sec+'</h2>'+rows.map(r=>'<div class="field"><label>'+esc(r.label)+'</label><div class="meta">'+r.field_key+' / '+r.content_type+'</div>'+inputFor(r)+'<div style="margin-top:8px"><button class="btn" onclick="saveField('+r.id+')">保存</button></div></div>').join("")+'</section>').join("");
+  const {data,error}=await sb.from("site_content").select("*").order("section_order").order("sort_order");
+  if(error){toast("読込エラー："+error.message);return}
+  const groups={};(data||[]).forEach(r=>(groups[r.section_key]??=[]).push(r));
+  $("#sections").innerHTML=Object.entries(groups).map(([sec,rows])=>
+    '<section class="card"><h2 class="section-title">'+sec+'</h2>'+
+    rows.map(r=>
+      '<div class="field"><label>'+esc(r.label)+'</label>'+
+      '<div class="meta">'+r.field_key+' / '+r.content_type+'</div>'+
+      inputFor(r)+
+      '<div style="margin-top:8px"><button class="btn" onclick="saveField('+r.id+')">保存</button></div></div>'
+    ).join("")+'</section>'
+  ).join("");
 }
-async function saveField(id){const value=$("#f_"+id).value;const {error}=await sb.from("site_content").update({value}).eq("id",id);toast(error?"保存に失敗しました":"保存しました")}
+
+async function saveField(id){
+  const value=$("#f_"+id).value;
+  const {error}=await sb.from("site_content").update({value}).eq("id",id);
+  toast(error?"保存に失敗しました："+error.message:"保存しました");
+}
+
 async function uploadMedia(id,type){
- const input=$("#file_"+id);if(!input.files[0]){toast("ファイルを選択してください");return}
- const file=input.files[0];const ext=file.name.split(".").pop();const path=(type==="image"?"images/":"videos/")+Date.now()+"_"+Math.random().toString(36).slice(2)+"."+ext;
- const {error}=await sb.storage.from("site-media").upload(path,file,{upsert:false});
- if(error){toast("アップロード失敗");return}
- const {data}=sb.storage.from("site-media").getPublicUrl(path);$("#f_"+id).value=data.publicUrl;await saveField(id);load();
+  const input=$("#file_"+id);
+  if(!input.files[0]){toast("ファイルを選択してください");return}
+  const file=input.files[0];
+  const ext=(file.name.split(".").pop()||"bin").toLowerCase();
+  const path=(type==="image"?"images/":"videos/")+Date.now()+"_"+Math.random().toString(36).slice(2)+"."+ext;
+  const {error}=await sb.storage.from("site-media").upload(path,file,{upsert:false});
+  if(error){toast("アップロード失敗："+error.message);return}
+  const {data}=sb.storage.from("site-media").getPublicUrl(path);
+  $("#f_"+id).value=data.publicUrl;
+  await saveField(id);
+  load();
 }
-$("#loginBtn").onclick=login;$("#logoutBtn").onclick=logout;$("#reloadBtn").onclick=load;
-sb.auth.onAuthStateChange((_e,s)=>{if(s)showApp()});
+
+$("#magicBtn").onclick=magicLogin;
+$("#loginBtn").onclick=passwordLogin;
+$("#signupBtn").onclick=signup;
+$("#logoutBtn").onclick=logout;
+$("#reloadBtn").onclick=load;
+$("#password").addEventListener("keydown",e=>{if(e.key==="Enter")passwordLogin()});
+
+sb.auth.onAuthStateChange((_event,session)=>{if(session)showApp()});
 showApp();
 </script>
-</body></html>
+</body>
+</html>
